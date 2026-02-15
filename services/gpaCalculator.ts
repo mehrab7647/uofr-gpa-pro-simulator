@@ -3,15 +3,26 @@ import { Course, GPAResult } from '../types';
 
 export const calculateGPA = (courses: Course[]): GPAResult => {
   // --- LOGIC: Filter Repeats ---
-  // We only keep the course with the HIGHEST term number
+  // We only keep the course with the HIGHEST term number.
+  // If terms are tied (e.g., multiple simulated courses), we take the one added LATEST in the list.
+  
   const uniqueCoursesMap = new Map<string, Course>();
   
-  // Sort by term descending to easily pick the latest
-  const sortedCourses = [...courses].sort((a, b) => b.term - a.term);
+  // Create a copy with original index to handle tie-breaks
+  const coursesWithMetadata = courses.map((c, index) => ({ ...c, originalIndex: index }));
+
+  // Sort by term descending, then by originalIndex descending
+  const sortedCourses = [...coursesWithMetadata].sort((a, b) => {
+    if (b.term !== a.term) {
+      return b.term - a.term;
+    }
+    return b.originalIndex - a.originalIndex;
+  });
 
   sortedCourses.forEach(c => {
-    const name = c.course.trim().toUpperCase();
-    if (!uniqueCoursesMap.has(name)) {
+    // Normalize name: Upper case and remove ALL spaces (CS 110 -> CS110)
+    const name = c.course.replace(/\s+/g, '').toUpperCase();
+    if (name && !uniqueCoursesMap.has(name)) {
       uniqueCoursesMap.set(name, c);
     }
   });
@@ -41,8 +52,7 @@ export const calculateGPA = (courses: Course[]): GPAResult => {
       if (isNaN(numericGrade)) return;
     }
 
-    // Rule: Grades 0-55 are treated as 55
-    // Note: PHP logic says if ($numeric_grade < 55 && $numeric_grade > 0)
+    // Rule: Grades 0-55 are treated as 55 (UofR 0-55 rule)
     if (numericGrade < 55 && numericGrade > 0) {
       numericGrade = 55;
     }
@@ -53,7 +63,7 @@ export const calculateGPA = (courses: Course[]): GPAResult => {
 
   const rawGpa = totalHours > 0 ? totalPoints / totalHours : 0;
   
-  // Rule: Truncate to 2 decimals (no rounding)
+  // Rule: Truncate to 2 decimals (no rounding) as per UofR policy
   const gpa = Math.floor(rawGpa * 100) / 100;
 
   return {
