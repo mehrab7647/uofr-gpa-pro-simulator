@@ -1,0 +1,6 @@
+
+{
+  "name": "UofR GPA Pro Simulator",
+  "description": "A high-performance GPA simulation tool for University of Regina students, featuring retake logic and special grade handling (NP/XF).",
+  "requestFramePermissions": []
+}

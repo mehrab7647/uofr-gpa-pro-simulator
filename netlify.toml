@@ -1,0 +1,14 @@
+[build]
+  # The command to run to build your site
+  command = "npm run build"
+  
+  # The directory that contains the deploy-ready HTML/assets
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
