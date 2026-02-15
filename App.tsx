@@ -188,6 +188,7 @@ const App: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {courses.map((course) => {
+                    // Check if this specific instance is the one being used in calculations
                     const isUsed = gpaData.coursesUsed.some(cu => cu.id === course.id);
                     return (
                       <tr key={course.id} className={`group hover:bg-gray-50/50 transition-colors ${!isUsed ? 'opacity-40 grayscale' : ''}`}>
